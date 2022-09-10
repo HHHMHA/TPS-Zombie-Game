@@ -5,8 +5,14 @@ using UnityEngine;
 
 public class Player : MonoBehaviour {
     [Header( "Player Movement" )] [SerializeField] private float playerSpeed = 1.9f;
+    
     [Header( "Player Animator and Gravity" )] [SerializeField]
     private CharacterController controller;
+
+    [Header( "Player Jumping and velocity" )] [SerializeField]
+    private float turnCalmTime = 0.1f;
+
+    private float turnCalmVelocity;
 
     private void Update() {
         PlayerMove();
@@ -20,7 +26,8 @@ public class Player : MonoBehaviour {
 
         if ( direction.magnitude >= 0.1f ) {
             float targetAngle = Mathf.Atan2( direction.x, direction.z ) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler( 0f, targetAngle, 0f );
+            float angle = Mathf.SmoothDampAngle( transform.eulerAngles.y, targetAngle, ref turnCalmVelocity, turnCalmTime );
+            transform.rotation = Quaternion.Euler( 0f, angle, 0f );
             controller.Move( direction.normalized * (playerSpeed * Time.deltaTime) );
         }
     }
