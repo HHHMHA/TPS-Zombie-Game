@@ -22,11 +22,13 @@ public class Player : MonoBehaviour {
     [SerializeField] private Transform surfaceCheck;
     [SerializeField] private float surfaceDistance = 0.4f;
     [SerializeField] private LayerMask surfaceMask;
+    [SerializeField] private Vector3 velocity;
+
 
     private float turnCalmVelocity;
-    private Vector3 velocity;
 
     private void Update() {
+        TryJump();
         ApplyGravity();
         PlayerMove();
     }
@@ -36,7 +38,7 @@ public class Player : MonoBehaviour {
             velocity.y = -2f;
         }
 
-        velocity.y += gravity;
+        velocity.y += gravity * Time.deltaTime;
         controller.Move( velocity * Time.deltaTime );
     }
 
@@ -57,6 +59,12 @@ public class Player : MonoBehaviour {
 
             Vector3 moveDirection = Quaternion.Euler( 0f, targetAngle, 0f ) * Vector3.forward;
             controller.Move( moveDirection.normalized * ( playerSpeed * Time.deltaTime ) );
+        }
+    }
+
+    private void TryJump() {
+        if ( Input.GetButtonDown( "Jump" ) && onSurface ) {
+            velocity.y = Mathf.Sqrt( jumpRange * -2 * gravity );
         }
     }
 }
