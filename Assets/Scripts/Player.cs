@@ -7,6 +7,8 @@ public class Player : MonoBehaviour {
     [Header( "Player Movement" )] [SerializeField]
     private float playerSpeed = 1.9f;
 
+    [SerializeField] private float playerSprintBoost = 3f;
+
     [Header( "Player Script Cameras" )] [SerializeField]
     private Transform playerCamera;
 
@@ -44,6 +46,8 @@ public class Player : MonoBehaviour {
 
     private bool onSurface => Physics.CheckSphere( surfaceCheck.position, surfaceDistance, surfaceMask );
     private bool onGround => velocity.y < 0;
+    
+    private float currentSpeed => isSprinting ? playerSpeed + playerSprintBoost : playerSpeed;
 
     private void PlayerMove() {
         float horizontalAxis = Input.GetAxisRaw( "Horizontal" );
@@ -58,7 +62,8 @@ public class Player : MonoBehaviour {
             transform.rotation = Quaternion.Euler( 0f, angle, 0f );
 
             Vector3 moveDirection = Quaternion.Euler( 0f, targetAngle, 0f ) * Vector3.forward;
-            controller.Move( moveDirection.normalized * ( playerSpeed * Time.deltaTime ) );
+            float speed = currentSpeed;
+            controller.Move( moveDirection.normalized * ( currentSpeed * Time.deltaTime ) );
         }
     }
 
@@ -67,4 +72,6 @@ public class Player : MonoBehaviour {
             velocity.y = Mathf.Sqrt( jumpRange * -2 * gravity );
         }
     }
+
+    private bool isSprinting => Input.GetButton( "Sprint" ) && onSurface;
 }
