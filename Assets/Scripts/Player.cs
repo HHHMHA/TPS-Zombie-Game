@@ -16,6 +16,7 @@ public class Player : MonoBehaviour {
     private CharacterController controller;
 
     [SerializeField] private float gravity = -9.81f;
+    [SerializeField] private Animator animator;
 
     [Header( "Player Jumping and velocity" )] [SerializeField]
     private float turnCalmTime = 0.1f;
@@ -28,6 +29,12 @@ public class Player : MonoBehaviour {
 
 
     private float turnCalmVelocity;
+    private static readonly int Idle = Animator.StringToHash( "Idle" );
+    private static readonly int Walk = Animator.StringToHash( "Walk" );
+    private static readonly int Running = Animator.StringToHash( "Running" );
+    private static readonly int RifleWalk = Animator.StringToHash( "RifleWalk" );
+    private static readonly int IdleAim = Animator.StringToHash( "IdleAim" );
+    private static readonly int Jump = Animator.StringToHash( "Jump" );
 
     private void Update() {
         TryJump();
@@ -56,6 +63,14 @@ public class Player : MonoBehaviour {
         Vector3 direction = new Vector3( horizontalAxis, 0f, verticalAxis ).normalized;
 
         if ( direction.magnitude >= 0.1f ) {
+            if ( onSurface ) {
+                animator.SetBool( Idle, false );
+                animator.SetBool( Walk, true );
+                animator.SetBool( Running, isSprinting );
+                animator.SetBool( RifleWalk, false );
+                animator.SetBool( IdleAim, false );
+            }
+            
             float targetAngle = Mathf.Atan2( direction.x, direction.z ) * Mathf.Rad2Deg + playerCamera.eulerAngles.y;
             float angle = Mathf.SmoothDampAngle( transform.eulerAngles.y, targetAngle, ref turnCalmVelocity,
                 turnCalmTime );
@@ -64,13 +79,24 @@ public class Player : MonoBehaviour {
             Vector3 moveDirection = Quaternion.Euler( 0f, targetAngle, 0f ) * Vector3.forward;
             float speed = currentSpeed;
             controller.Move( moveDirection.normalized * ( currentSpeed * Time.deltaTime ) );
+            return;
         }
+        
+        animator.SetBool( Idle, true );
+        animator.SetBool( Walk, false );
+        animator.SetBool( Running, false );
     }
 
     private void TryJump() {
         if ( Input.GetButtonDown( "Jump" ) && onSurface ) {
+            animator.SetBool( Idle, false );
+            animator.SetBool( Walk, false );
+            animator.SetBool( Running, false );
+            animator.SetTrigger( Jump );
             velocity.y = Mathf.Sqrt( jumpRange * -2 * gravity );
+            return;
         }
+        // animator.SetBool( Idle, true );
     }
 
     private bool isSprinting => Input.GetButton( "Sprint" ) && onSurface;
