@@ -36,6 +36,10 @@ public class Player : MonoBehaviour {
     private static readonly int IdleAim = Animator.StringToHash( "IdleAim" );
     private static readonly int Jump = Animator.StringToHash( "Jump" );
 
+    private void Start() {
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
     private void Update() {
         TryJump();
         ApplyGravity();

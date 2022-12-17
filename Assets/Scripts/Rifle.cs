@@ -18,7 +18,9 @@ public class Rifle : MonoBehaviour {
 
         var transform1 = camera.transform;
         if ( Physics.Raycast( transform1.position, transform1.forward, out hit, shootingRange ) ) {
-            
+            ObjectToHit objectToHit = hit.transform.GetComponent<ObjectToHit>();
+            if (!objectToHit) return;
+            objectToHit.Damage( giveDamageOf );
         }
     }
 }
