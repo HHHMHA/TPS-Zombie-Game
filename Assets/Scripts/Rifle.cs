@@ -11,6 +11,7 @@ public class Rifle : MonoBehaviour {
     [SerializeField] private float fireCharge = 15;
     private float nextTimeToShoot = 0f;
     public Player player;
+    [SerializeField] private Transform hand;
 
     [Header( "Rifle Ammunition and shooting" )]
     [SerializeField] private int maximumAmmunition = 32;
@@ -26,6 +27,7 @@ public class Rifle : MonoBehaviour {
 
     private void Awake() {
         presentAmmunition = maximumAmmunition;
+        transform.SetParent( hand );
         
     }
     private void Update() {
